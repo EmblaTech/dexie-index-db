@@ -1,19 +1,31 @@
 import { Injectable } from "@angular/core";
 import Dexie from "dexie";
 import { IndexDBService } from "./db-service";
-import { Individual } from "../model/individual";
+import { Individual } from "../model/domain/individual";
+import { Family } from "../model/domain/family";
+import { MultiMedia } from "../model/domain/multimedia";
 
 @Injectable({
     providedIn: 'root'
   })
 export class IndividualService {
     individualTbl : Dexie.Table;
-    INDIVIDUAL_COUNT = 1000000;
+    familyTbl: Dexie.Table;
+    eventTbl: Dexie.Table;
+    multiMediaTbl: Dexie.Table;
+    placeTbl: Dexie.Table;
+
+    INDIVIDUAL_COUNT = 100;
     SAMPLE_DATA_COUNT = 100;
     BATCH_SIZE = 1000
 
     constructor(private dbService: IndexDBService) { 
         this.individualTbl = this.dbService.getIndividualStore();
+        this.familyTbl = this.dbService.getFamilyStore();
+        this.eventTbl = this.dbService.getEventStore();
+        this.multiMediaTbl = this.dbService.getMultiMediaStore();
+        this.placeTbl = this.dbService.getPlaceStore();
+
         //this.individualTbl.hook('creating', this.captureChangeData('created'))
         this.individualTbl.hook('updating', this.captureUpdatedData())
         this.individualTbl.hook('deleting', this.captureDeletedData())
@@ -96,6 +108,40 @@ export class IndividualService {
             //console.log("Captured " + operation + " data: " + JSON.stringify(obj) )
             alert("Captured deleted data: " + JSON.stringify(obj))
           };
+    }
+
+    async getEvents(individualId: number): Promise<Event[]> {
+        const individual = await this.individualTbl.get(individualId);
+        if (individual?.eventIds) {
+          return await this.eventTbl.bulkGet(individual.eventIds);
+        }
+        return [];
+    }
+
+    async getFamilies(individualId: number): Promise<Family[]> {
+        const individual = await this.individualTbl.get(individualId);
+        if (individual?.familyIds) {
+          return await this.familyTbl.bulkGet(individual.familyIds);
+        };
+        return []
+    }
+
+    async getCurrentFamily(individualId: number): Promise<Family | undefined> {
+        const families = await this.getFamilies(individualId);
+        return families.find(f => f.isDefault === true);
+    }
+
+    async getMultiMedias(individualId: number): Promise<MultiMedia[]> {
+        const individual = await this.individualTbl.get(individualId);
+        if (individual?.multiMediaIds) {
+          return await this.multiMediaTbl.bulkGet(individual.multiMediaIds);
+        };
+        return []
+    }
+
+    async getProfileImage(individualId: number): Promise<MultiMedia | undefined> {
+        const images = await this.getMultiMedias(individualId);
+        return images.find(m => m.isDefault === true); // Filter out only default image
     }
 
     firstNames = [

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Individual } from '../model/individual';
 import { IndividualService } from '../service/individual-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { Individual } from '../model/domain/individual';
 
 @Component({
   selector: 'app-individuals',

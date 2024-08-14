@@ -10,6 +10,8 @@ export interface Individual {
     address?: string | '';
     birthPlace?: string | ''; 
     isAlive?: boolean | false; 
+    familyIds?: number[];
     eventIds? : number[];
     multiMediaIds?: number[];
+    places?: number[];
   }
