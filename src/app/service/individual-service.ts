@@ -15,7 +15,7 @@ export class IndividualService {
     multiMediaTbl: Dexie.Table;
     placeTbl: Dexie.Table;
 
-    INDIVIDUAL_COUNT = 100;
+    INDIVIDUAL_COUNT = 100000;
     SAMPLE_DATA_COUNT = 100;
     BATCH_SIZE = 1000
 
